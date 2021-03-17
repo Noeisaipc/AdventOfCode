@@ -9,9 +9,21 @@ defmodule BoardingScan do
     |> Enum.to_list()
     |> Enum.map(fn passport -> get_boarding_pass_information(passport) end)
     |> Enum.map(fn passport -> calculate_id(Map.get(passport,:x),Map.get(passport,:y)) end)
-    |> Enum.sort()
-#    |> List.last()
+    |> Enum.max()
+#    |> find_my_passport_id()
 #    |> inspect()
+  end
+
+  def read_file_part_2(path) do
+    path
+    |> File.stream!()
+    |> Stream.map(&String.trim(&1, "\n"))
+    |> Stream.map(&String.split(&1, "\n"))
+    |> Stream.concat()
+    |> Enum.to_list()
+    |> Enum.map(fn passport -> get_boarding_pass_information(passport) end)
+    |> Enum.map(fn passport -> calculate_id(Map.get(passport,:x),Map.get(passport,:y)) end)
+    |> Enum.sort()
     |> find_my_passport_id()
     |> inspect()
   end
@@ -25,10 +37,10 @@ defmodule BoardingScan do
 
   def split(start..final = range, [head | tail]) do
     case head do
-       ?F -> split(start..trunc(((Enum.count(range)/2)-1+start)), tail)
-       ?L -> split(start..trunc(((Enum.count(range)/2)-1+start)), tail)
-       ?B -> split(trunc(((Enum.count(range)/2)+start))..final, tail)
-       ?R -> split(trunc(((Enum.count(range)/2)+start))..final, tail)
+       value when value == ?F or value == ?L -> split(start..trunc(((Enum.count(range)/2)-1+start)), tail)
+       #?L -> split(start..trunc(((Enum.count(range)/2)-1+start)), tail)
+       value when value == ?B or value == ?R -> split(trunc(((Enum.count(range)/2)+start))..final, tail)
+       #?R -> split(trunc(((Enum.count(range)/2)+start))..final, tail)
     end
   end
 
